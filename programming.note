@@ -1,0 +1,19 @@
+uMCTL2 programming note below:
+1. register type: static, dynamic and quasi-dyamic.
+	1.1 static regs only must be programmed in reset phase;
+	1.2 dynamic regs could be programmed in any phase include reset and active;
+	1.3 quasi-dynamic regs has some restrict to use, NOT ANY XFER on HIF.
+2. Initialization has a reserved flow.
+	2.1 Controller Initialization below:
+	1 After power up, presetn asserted first before aresetn and core_ddrc_rstn
+	2 And then three clocks work, pclk, aclk, core_ddrc_clk
+	3 After clocks stable, deassert presetn
+	4 aclk and core_clk domain register initialization
+	5 deassert aresetn and core_ddrc_rstn, and then initialization done.
+	2.2 PHY Initialization, !!! MUST set DFIMISC.dfi_init_complete_en to 0, cause
+		DWC DDR PHY toggles the dfi_init_complete signal several times during its
+		initialization routine!!!
+	2.3 SDRAM Initialization, uMCTL2 auto start SRAM INIT when detect dfi_init_complete
+		signal from PHY(DFIMISC.dfi_init_complete_en==1). And can be skipped by pro-
+		gramming INIT0.skip_dram_init=2'b01/2'b11, then use PUB.
+3. 				
